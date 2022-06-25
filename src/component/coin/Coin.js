@@ -14,8 +14,10 @@ import { Pagination } from '@mui/material';
 export function Crypto() {
   const [coins, setCoins] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [coinsPerPage] = useState(8);
+
   const [search, setSearch] = useState('');
 
   const fetchApi = useCallback(async () => {

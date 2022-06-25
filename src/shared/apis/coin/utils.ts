@@ -7,5 +7,5 @@ const BASE_URL: string =
 const API_KEY: string = 'CMC_PRO_API_KEY=98b31430-cd61-492e-830c-528c73e56a01';
 
 export const getCoinList = async () => {
-  return await axios.get<CoinRootObject.RootObject>(BASE_URL + API_KEY);
+  return (await axios.get<CoinRootObject.RootObject>(BASE_URL + API_KEY)).data;
 };
