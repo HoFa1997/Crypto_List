@@ -1,117 +1,84 @@
-import React, {useEffect, useState} from 'react';
-import styled from "styled-components";
-import './css/Cryptoo.css'
-import {getCoin} from "./CoinApi";
-import Loader from "./Loader";
-import CoinItem from "./CoinItem";
-import {DebounceInput} from 'react-debounce-input'
+import React, { useCallback, useEffect, useState } from 'react';
+import { DebounceInput } from 'react-debounce-input';
 
-const CoinWrapper = styled.div`
-  display: flex;
-  width: 800px;
-  margin: auto;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+//Style
+import '../../css/Cryptoo.css';
 
-`;
+//Components
+import { getCoin } from '../utils/Api';
+import Loader from '../utils/Loader';
+import CoinItem from './CoinItem';
+import CoinTable from './CoinTable';
+import { Pagination } from '@mui/material';
 
-const TableCoinItem = styled.table`
-  width: inherit;
-  border-collapse: collapse;
-  font-family: sans-serif;
-`;
+export function Crypto() {
+  const [coins, setCoins] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [coinsPerPage] = useState(8);
+  const [search, setSearch] = useState('');
 
-const TableHeadCoinItem = styled.thead`
-  background-color: gray;
-  color: white;
-`;
+  const fetchApi = useCallback(async () => {
+    setLoading(true);
+    const res = await getCoin();
+    setCoins(res.data);
+    setLoading(false);
+  }, []);
 
-const Th = styled.th`
-  padding: 10px 0;
-  :first-child {
-    border-top-left-radius: 10px;
-  }
-  :last-child {
-    border-top-right-radius: 10px;
-  }
-`;
+  useEffect(() => {
+    fetchApi();
+  }, []);
 
-const Tr = styled.tr`
-  text-align: left;
-  border-bottom: 2.5px solid black;
-`;
+  const searchHandler = (event) => {
+    setSearch(event.target.value);
+  };
 
-// eslint-disable-next-line no-global-assign
-export default Crypto = () => {
-
-    const [coins, setCoins] = useState([])
-    const [search, setSearch] = useState('')
-
-    useEffect(() => {
-        const fetchApi = async () => {
-            const data = await getCoin()
-            setCoins(data.data)
-            // console.log(data.data)
-        }
-        fetchApi()
-    }, [])
-
-    useEffect(() => {
-        console.log(search)
-    }, [search])
-
-    const searchHandler = (event) => {
-        setSearch(event.target.value)
-    }
-
-    const searchedCoin = coins.filter((coin) => {
-        return coin.name.toLowerCase().includes(search.toLowerCase())
-            || coin.symbol.toLowerCase().includes(search.toLowerCase())
-
-    })
-
+  // Add memoization
+  const searchedCoin = coins.filter((coin) => {
     return (
-        <>
-            <CoinWrapper>
-                <DebounceInput
-                    className="input"
-                    placeholder="Search Crypto..."
-                    minLength={2}
-                    debounceTimeout={500}
-                    onChange={searchHandler}
-                />
-                {coins.length ?
-                    <TableCoinItem>
-                        <TableHeadCoinItem>
-                            <Tr>
-                                <Th></Th>
-                                <Th>Name</Th>
-                                <Th>Symbol</Th>
-                                <Th>Price</Th>
-                                <Th>Change 24h</Th>
-                                <Th>MarketCap</Th>
-                            </Tr>
-                        </TableHeadCoinItem>
-                        <tbody>
-                        {
-                            searchedCoin.map(coin => <CoinItem
-                                key={coin.id}
-                                name={coin.name}
-                                symbol={coin.symbol}
-                                image={`https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png`}
-                                price={coin.quote.USD.price}
-                                volume_change_24h={coin.quote.USD.percent_change_24h}
-                                marketCap={coin.quote.USD.market_cap}
-
-                            />)
-                        }
-                        </tbody>
-                    </TableCoinItem> :
-                    <Loader/>}
-            </CoinWrapper>
-        </>
-
+      coin.name.toLowerCase().includes(search.toLowerCase()) ||
+      coin.symbol.toLowerCase().includes(search.toLowerCase())
     );
-};
+  });
 
+  //get current page
+  const indexOfLastCoin = currentPage * coinsPerPage;
+  const indexOfFirstCoin = indexOfLastCoin - coinsPerPage;
+  const currentCoin = searchedCoin.slice(indexOfFirstCoin, indexOfLastCoin);
+
+  //change page
+  const pageNumber = Math.ceil(searchedCoin.length / coinsPerPage);
+  // const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const handelChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <DebounceInput
+        className="input"
+        placeholder="Search Crypto..."
+        minLength={2}
+        debounceTimeout={500}
+        onChange={searchHandler}
+      />
+      <CoinTable coins={currentCoin} loading={loading} />
+      <Pagination
+        variant="outlined"
+        shape="rounded"
+        count={pageNumber}
+        onChange={(_, pageNumber) => handelChange(pageNumber)}
+        hidePrevButton
+        hideNextButton
+      />
+    </div>
+  );
+}
+
+export default Crypto;

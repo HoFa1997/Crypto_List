@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "alwaysStrict": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "baseUrl": "src",
+    "lib": ["DOM", "ES2017"],
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "target": "esnext"
+  },
+  "paths": {
+    "*": ["src/*"]
+  }
+}
