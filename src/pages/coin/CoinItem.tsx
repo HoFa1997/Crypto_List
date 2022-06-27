@@ -17,7 +17,11 @@ const CoinItem = ({
       <TableCell align="left">{name}</TableCell>
       <TableCell align="left">{symbol}</TableCell>
       <TableCell align="left">$ {price.toFixed(2)}</TableCell>
-      <TableCell align="left">{volume_change_24h.toFixed(2)}%</TableCell>
+      <TableCell
+        align="left"
+        sx={{ color: volume_change_24h >= 0 ? 'green' : 'red' }}>
+        {volume_change_24h.toFixed(2)}%
+      </TableCell>
       <TableCell align="left">$ {marketCap}</TableCell>
     </TableRow>
   );
