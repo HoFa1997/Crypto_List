@@ -14,6 +14,7 @@ import { CoinList } from 'shared/components/coin/List';
 import { usePagination } from 'shared/hooks/usePagination';
 
 const MainDiv = styled.div`
+  font-size: 100px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -21,7 +22,6 @@ const MainDiv = styled.div`
 `;
 
 export function CoinPage() {
-
   //state for save search text from user
   const [inputSearch, setInputSearch] = useState<string>('');
 
@@ -32,7 +32,7 @@ export function CoinPage() {
   //filter coinList for search result
   const searchedCoins = useSearch(inputSearch, coins);
 
-  const [pagination,paginationList] = usePagination(searchedCoins,5)
+  const [pagination, paginationList] = usePagination(searchedCoins, 5);
 
   //handel searchInput from user
   const handleSearch = (event) => {
@@ -40,7 +40,7 @@ export function CoinPage() {
   };
 
   if (error) {
-    return <h1>ERROR</h1>;
+    return <MainDiv>ERROR Enable CORS Mode</MainDiv>;
   }
   if (loading) {
     return <Loader />;
